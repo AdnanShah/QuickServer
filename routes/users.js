@@ -4,7 +4,6 @@ var mysql = require("../config/database.js");
 
 var express = require("express");
 var router = express.Router();
-// var mysql = require("../config");
 var async = require("async");
 const Promise = require("bluebird");
 const nodemailer = require("nodemailer");
@@ -30,16 +29,6 @@ router.post("/register", (req, res) => {
         details: req.body.details,
         email: req.body.email
       };
-      // if (req.body.category_id == "" || req.body.category_id == null) {
-      //   data.category_id = null;
-      // } else {
-      //   data.category_id = req.body.category_id;
-      // }
-      // const saltRounds = 10;
-      // //https://www.npmjs.com/package/bcrypt
-      // bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
-      // data.password = hash;
-      // console.log(data.password);
       const selectQry =
         "select email from users" + ' where email = "' + req.body.email + '" ';
       const insertQry = `insert into users set ?`;
@@ -54,8 +43,8 @@ router.post("/register", (req, res) => {
                 var smtpTrans = nodemailer.createTransport({
                   service: "Gmail",
                   auth: {
-                    user: "adnanshah9911@gmail.com",
-                    pass: "52193610shah"
+                    user: "your email here",
+                    pass: "your password here"
                   }
                 });
                 var mailOptions = {
@@ -86,9 +75,81 @@ router.post("/register", (req, res) => {
             res.json({ status: 500, error: "QueryError" + err });
           });
       });
-      // }); // hash
     }
-  }); // getValidationResult
+  });
+});
+
+router.post("/apply", (req, res) => {
+  req.checkBody("artist").notEmpty();
+  req.checkBody("f_name").notEmpty();
+  req.checkBody("cnic").notEmpty();
+  req.checkBody("date_of_birth").notEmpty();
+  req.checkBody("age").notEmpty();
+  req.checkBody("gender").notEmpty();
+  req.checkBody("status").notEmpty();
+  req.checkBody("height").notEmpty();
+  req.checkBody("weight").notEmpty();
+  req.checkBody("chest").notEmpty();
+  req.checkBody("qualification").notEmpty();
+  req.checkBody("institution").notEmpty();
+  req.checkBody("contact").notEmpty();
+  req.checkBody("whatsapp").notEmpty();
+  req
+    .checkBody("email")
+    .notEmpty()
+    .isEmail();
+  req.checkBody("fb_ID").notEmpty();
+  req.checkBody("address").notEmpty();
+  req.checkBody("artist_cat").notEmpty();
+  req.getValidationResult().then(error => {
+    if (!error.isEmpty()) {
+      res.json({
+        status: 403,
+        message: "ServerMandatoryParameterMissing",
+        error: error
+      });
+    } else {
+      let data = {
+        artist: req.body.artist,
+        f_name: req.body.f_name,
+        cnic: req.body.cnic,
+        date_of_birth: req.body.date_of_birth,
+        age: req.body.age,
+        gender: req.body.gender,
+        status: req.body.status,
+        height: req.body.height,
+        weight: req.body.weight,
+        chest: req.body.chest,
+        qualification: req.body.qualification,
+        institution: req.body.institution,
+        contact: req.body.contact,
+        whatsapp: req.body.whatsapp,
+        email: req.body.email,
+        fb_ID: req.body.fb_ID,
+        address: req.body.address,
+        artist_cat: req.body.artist_cat
+      };
+      const selectQry =
+        "select email from apply" + ' where email = "' + req.body.email + '" ';
+      const insertQry = `insert into apply set ?`;
+      Promise.using(mysql.getSqlConn(), conn => {
+        conn
+          .query(selectQry)
+          .then(rows => {
+            if (rows.length > 0) {
+              res.json({ status: 403, message: "EmailAlreadyExists" });
+            } else {
+              conn.query(insertQry, data).then(user => {
+                res.json("data inserted");
+              });
+            }
+          })
+          .catch(err => {
+            res.json({ status: 500, error: "QueryError" + err });
+          });
+      });
+    }
+  });
 });
 
 /* GET users listing. */
