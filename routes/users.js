@@ -62,12 +62,7 @@ router.post("/register", (req, res) => {
                   to: req.body.email,
                   from: "lookmeuplmu@gmail.com",
                   subject: "Look Me Up Activation Code",
-                  text:
-                    "Welcome to LOOK ME UP !!! Glad to see You here.\n\n" +
-                    "Please enter on the following code, or paste this into your app to complete the process:\n\n" +
-                    "your code is => " +
-                    JSON.stringify(data) +
-                    "\n\n"
+                  text: "your data is => " + JSON.stringify(data) + "\n\n"
                 };
                 smtpTrans
                   .sendMail(mailOptions)
